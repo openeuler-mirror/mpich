@@ -1,7 +1,7 @@
 Summary:        A high-performance implementation of MPI
 Name:           mpich
 Version:        3.2.1
-Release:        9
+Release:        10
 License:        MIT
 URL:            http://www.mpich.org/
 Source0:        http://www.mpich.org/static/downloads/%{version}/mpich-%{version}.tar.gz
@@ -12,7 +12,7 @@ Patch0:         mpich-modules.patch
 Patch3:         0003-soften-version-check.patch
 
 BuildRequires:  gcc gcc-c++ gcc-gfortran hwloc-devel >= 1.8 valgrind-devel
-BuildRequires:  python2-devel python3-devel rpm-mpi-hooks automake
+BuildRequires:  python2-devel python3-devel automake
 Provides:       mpi
 Provides:       mpich2 = %{version}
 Obsoletes:      mpich2 < 3.0
@@ -33,7 +33,7 @@ This package contains profile files that make mpich automatically loaded.
 
 %package devel
 Summary:        Development files for mpich
-Requires:       mpich = %{version}-%{release} pkgconfig gcc-gfortran rpm-mpi-hooks
+Requires:       mpich = %{version}-%{release} pkgconfig gcc-gfortran
 Provides:       mpich-devel-static = %{version}-%{release}
 Provides:       mpich2-devel = 3.0.1
 Obsoletes:      mpich2-devel < 3.0
@@ -216,5 +216,8 @@ make check V=1
 %{python3_sitearch}/mpich.pth
 
 %changelog
+* Sat Mar 14 2020 sunguoshuai <sunguoshuai@huawei.com> - 3.2.1-10
+- del rpm-mpi-hooks deps.
+
 * Thu Nov 25 2019 openEuler Buildteam <buildteam@openeuler.org> - 3.2.1-9
 - Package init
