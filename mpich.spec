@@ -1,7 +1,7 @@
 Summary:        A high-performance implementation of MPI
 Name:           mpich
 Version:        3.2.1
-Release:        11
+Release:        12
 License:        MIT
 URL:            http://www.mpich.org/
 Source0:        http://www.mpich.org/static/downloads/%{version}/mpich-%{version}.tar.gz
@@ -202,6 +202,9 @@ make check V=1
 %{python3_sitearch}/mpich.pth
 
 %changelog
+* Fri Oct 30 2020 wangxiao <wangxiao65@huawei.com> - 3.2.1-12
+- delete unnessary file
+
 * Wed Oct 21 2020 wangxiao <wangxiao65@huawei.com> - 3.2.1-11
 - drop python2 subpackage
 
