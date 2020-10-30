@@ -1,18 +1,17 @@
 Summary:        A high-performance implementation of MPI
 Name:           mpich
 Version:        3.2.1
-Release:        10
+Release:        11
 License:        MIT
 URL:            http://www.mpich.org/
 Source0:        http://www.mpich.org/static/downloads/%{version}/mpich-%{version}.tar.gz
 Source1:        mpich.macros
-Source2:        mpich.pth.py2
-Source3:        mpich.pth.py3
+Source2:        mpich.pth.py3
 Patch0:         mpich-modules.patch
 Patch3:         0003-soften-version-check.patch
 
 BuildRequires:  gcc gcc-c++ gcc-gfortran hwloc-devel >= 1.8 valgrind-devel
-BuildRequires:  python2-devel python3-devel automake
+BuildRequires:  python3-devel automake
 Provides:       mpi
 Provides:       mpich2 = %{version}
 Obsoletes:      mpich2 < 3.0
@@ -52,12 +51,6 @@ Obsoletes:      mpich-doc < %{version}-%{release}
 
 %description help
 Contains documentations, examples and man-pages for mpich.
-
-%package -n python2-mpich
-Summary:        mpich support for Python 2
-
-%description -n python2-mpich
-mpich support for Python 2.
 
 %package -n python3-mpich
 Summary:        mpich support for Python 3
@@ -139,7 +132,6 @@ mkdir -p %{buildroot}%{_sysconfdir}/modulefiles/mpi
 sed -r 's|%{_bindir}|%{_libdir}/mpich/bin|;
         s|@LIBDIR@|%{_libdir}/mpich|;
         s|@MPINAME@|mpich|;
-        s|@py2sitearch@|%{python2_sitearch}|;
         s|@py3sitearch@|%{python3_sitearch}|;
         s|@ARCH@|%{_arch}|;
         s|@fortranmoddir@|%{_fmoddir}|;
@@ -155,10 +147,8 @@ cp -p %{buildroot}%{_sysconfdir}/profile.d/mpich-%{_arch}.{sh,csh}
 
 install -pDm0644 %{SOURCE1} %{buildroot}%{_rpmconfigdir}/macros.d/macros.mpich
 
-mkdir -p %{buildroot}%{python2_sitearch}/mpich
-install -pDm0644 %{SOURCE2} %{buildroot}%{python2_sitearch}/mpich.pth
 mkdir -p %{buildroot}%{python3_sitearch}/mpich
-install -pDm0644 %{SOURCE3} %{buildroot}%{python3_sitearch}/mpich.pth
+install -pDm0644 %{SOURCE2} %{buildroot}%{python3_sitearch}/mpich.pth
 
 find %{buildroot} -type f -name "*.la" -delete
 
@@ -207,15 +197,14 @@ make check V=1
 %{_mandir}/mpich-%{_arch}/man1/
 %{_mandir}/mpich-%{_arch}/man3/
 
-%files -n python2-mpich
-%dir %{python2_sitearch}/mpich
-%{python2_sitearch}/mpich.pth
-
 %files -n python3-mpich
 %dir %{python3_sitearch}/mpich
 %{python3_sitearch}/mpich.pth
 
 %changelog
+* Wed Oct 21 2020 wangxiao <wangxiao65@huawei.com> - 3.2.1-11
+- drop python2 subpackage
+
 * Sat Mar 14 2020 sunguoshuai <sunguoshuai@huawei.com> - 3.2.1-10
 - del rpm-mpi-hooks deps.
 
