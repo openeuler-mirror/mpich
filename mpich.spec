@@ -1,7 +1,7 @@
 Summary:        A high-performance implementation of MPI
 Name:           mpich
 Version:        3.2.1
-Release:        12
+Release:        13
 License:        MIT
 URL:            http://www.mpich.org/
 Source0:        http://www.mpich.org/static/downloads/%{version}/mpich-%{version}.tar.gz
@@ -101,7 +101,7 @@ mpich support for Python 3.
         CFLAGS="%{m_option} -O2 %{?XFLAGS}"                     \
         CXXFLAGS="%{m_option} -O2 %{?XFLAGS}"                   \
         FCFLAGS="%{m_option} -O2 %{?XFLAGS}"                    \
-        FFLAGS="%{m_option} -O2 %{?XFLAGS}"                     \
+        FFLAGS="%{m_option} -O2 %{?XFLAGS} -fallow-argument-mismatch"                     \
         LDFLAGS='-Wl,-z,noexecstack'                            \
         MPICHLIB_CFLAGS="%{?opt_cc_cflags}"                     \
         MPICHLIB_CXXFLAGS="%{optflags}"                         \
@@ -202,6 +202,9 @@ make check V=1
 %{python3_sitearch}/mpich.pth
 
 %changelog
+* Mon Aug 02 2021 linjiaxin5 <linjiaxin5@huawei.com> - 3.2.1-13
+- Fix failure caused by GCC upgrade to 10
+
 * Fri Oct 30 2020 wangxiao <wangxiao65@huawei.com> - 3.2.1-12
 - delete unnessary file
 
