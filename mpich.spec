@@ -1,7 +1,7 @@
 Summary:        A high-performance implementation of MPI
 Name:           mpich
 Version:        3.2.1
-Release:        13
+Release:        14
 License:        MIT
 URL:            http://www.mpich.org/
 Source0:        http://www.mpich.org/static/downloads/%{version}/mpich-%{version}.tar.gz
@@ -66,7 +66,7 @@ mpich support for Python 3.
 %{!?opt_fc_fflags: %global opt_fc_fflags %{optflags}}
 %{!?opt_f77_fflags: %global opt_f77_fflags %{optflags}}
 
-%ifarch aarch64
+%ifarch aarch64 riscv64
 %global m_option ""
 %else
 %global m_option -m64
@@ -202,6 +202,9 @@ make check V=1
 %{python3_sitearch}/mpich.pth
 
 %changelog
+* Fri Mar 11 2022 wangyangdahai <admin@you2.top> - 3.2.1-14
+- fix m64 flags riscv64
+
 * Mon Aug 02 2021 linjiaxin5 <linjiaxin5@huawei.com> - 3.2.1-13
 - Fix failure caused by GCC upgrade to 10
 
