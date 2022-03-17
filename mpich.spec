@@ -1,17 +1,18 @@
 Summary:        A high-performance implementation of MPI
 Name:           mpich
-Version:        3.2.1
-Release:        14
+Version:        4.0.1
+Release:        1
 License:        MIT
 URL:            http://www.mpich.org/
 Source0:        http://www.mpich.org/static/downloads/%{version}/mpich-%{version}.tar.gz
 Source1:        mpich.macros
 Source2:        mpich.pth.py3
-Patch0:         mpich-modules.patch
-Patch3:         0003-soften-version-check.patch
+Patch0:         autogen-only-deal-with-json-yaksa-if-enabled.patch
+Patch1:         autoconf-pull-dynamic-and-not-static-libs-from-pkg-config.patch
+Patch2:         mpich-modules.patch
 
-BuildRequires:  gcc gcc-c++ gcc-gfortran hwloc-devel >= 1.8 valgrind-devel
-BuildRequires:  python3-devel automake
+BuildRequires:  gcc gcc-c++ gcc-gfortran hwloc-devel >= 2.0 valgrind-devel
+BuildRequires:  python3-devel automake libtool
 Provides:       mpi
 Provides:       mpich2 = %{version}
 Obsoletes:      mpich2 < 3.0
@@ -58,68 +59,43 @@ Summary:        mpich support for Python 3
 %description -n python3-mpich
 mpich support for Python 3.
 
-%{!?opt_cc: %global opt_cc gcc}
-%{!?opt_fc: %global opt_fc gfortran}
-%{!?opt_f77: %global opt_f77 gfortran}
-
-%{!?opt_cc_cflags: %global opt_cc_cflags %{optflags}}
-%{!?opt_fc_fflags: %global opt_fc_fflags %{optflags}}
-%{!?opt_f77_fflags: %global opt_f77_fflags %{optflags}}
-
-%ifarch aarch64 riscv64
-%global m_option ""
-%else
-%global m_option -m64
-%endif
-%global selected_channels ch3:nemesis
-%global XFLAGS -fPIC
-
 %prep
-%autosetup -p1
+%setup
+
+%patch0
+%patch1
+%patch2 -p1
 
 %build
-%configure      \
-        --enable-sharedlibs=gcc                                 \
-        --enable-shared                                         \
-        --enable-static=no                                      \
-        --enable-lib-depend                                     \
-        --disable-rpath                                         \
-        --disable-silent-rules                                  \
-        --enable-fc                                             \
-        --with-device=%{selected_channels}                      \
-        --with-pm=hydra:gforker                                 \
-        --includedir=%{_includedir}/mpich-%{_arch}            \
-        --bindir=%{_libdir}/mpich/bin                         \
-        --libdir=%{_libdir}/mpich/lib                         \
-        --datadir=%{_datadir}/mpich                           \
-        --mandir=%{_mandir}/mpich-%{_arch}                    \
-        --docdir=%{_datadir}/mpich/doc                        \
-        --htmldir=%{_datadir}/mpich/doc                       \
-        --with-hwloc-prefix=system                              \
-        FC=%{opt_fc}                                            \
-        F77=%{opt_f77}                                          \
-        CFLAGS="%{m_option} -O2 %{?XFLAGS}"                     \
-        CXXFLAGS="%{m_option} -O2 %{?XFLAGS}"                   \
-        FCFLAGS="%{m_option} -O2 %{?XFLAGS}"                    \
-        FFLAGS="%{m_option} -O2 %{?XFLAGS} -fallow-argument-mismatch"                     \
-        LDFLAGS='-Wl,-z,noexecstack'                            \
-        MPICHLIB_CFLAGS="%{?opt_cc_cflags}"                     \
-        MPICHLIB_CXXFLAGS="%{optflags}"                         \
-        MPICHLIB_FCFLAGS="%{?opt_fc_fflags}"                    \
-        MPICHLIB_FFLAGS="%{?opt_f77_fflags}"
-#       MPICHLIB_LDFLAGS='-Wl,-z,noexecstack'                   \
-#       MPICH_MPICC_FLAGS="%{m_option} -O2 %{?XFLAGS}"  \
-#       MPICH_MPICXX_FLAGS="%{m_option} -O2 %{?XFLAGS}" \
-#       MPICH_MPIFC_FLAGS="%{m_option} -O2 %{?XFLAGS}"  \
-#       MPICH_MPIF77_FLAGS="%{m_option} -O2 %{?XFLAGS}"
-#       --with-openpa-prefix=embedded                           \
-#       FCFLAGS="%{?opt_fc_fflags} -I%{_fmoddir}/mpich %{?XFLAGS}"    \
+# Fix 'aclocal-1.15' is missing on your system
+autoreconf -f -i -v
+CONFIGURE_OPTS=(
+        --enable-sharedlibs=gcc
+        --enable-shared
+        --enable-static=no
+        --enable-lib-depend
+        --disable-rpath
+        --disable-silent-rules
+        --enable-fc
+        --with-device=ch3:nemesis
+        --with-pm=hydra:gforker
+        --includedir=%{_includedir}/%{name}-%{_arch}
+        --bindir=%{_libdir}/%{name}/bin
+        --libdir=%{_libdir}/%{name}/lib
+        --datadir=%{_datadir}/%{name}
+        --mandir=%{_mandir}/%{name}-%{_arch}
+        --docdir=%{_datadir}/%{name}/doc
+        --htmldir=%{_datadir}/%{name}/doc
+        --with-hwloc-prefix=system
+)
+
+%configure "${CONFIGURE_OPTS[@]}" FFLAGS="$FFLAGS -w -fallow-argument-mismatch" FCFLAGS="$FCFLAGS -w -fallow-argument-mismatch" CFLAGS="%optflags -fPIC" CXXLAGS="%optflags -fPIC" MPICHLIB_CFLAGS="%{optflags}" MPICHLIB_CXXFLAGS="%{optflags}"
 
 sed -r -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -r -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 sed -i -e 's| -shared | -Wl,--as-needed\0|g' libtool
 
-%make_build V=1
+%make_build V=1 VERBOSE=1
 
 %install
 %make_install
@@ -152,14 +128,12 @@ install -pDm0644 %{SOURCE2} %{buildroot}%{python3_sitearch}/mpich.pth
 
 find %{buildroot} -type f -name "*.la" -delete
 
-%check
-make check V=1
-
 %post -p /sbin/ldconfig
 
 %postun -p /sbin/ldconfig
 
 %files
+%defattr(-,root,root)
 %license COPYRIGHT
 %doc CHANGES README README.envvar RELEASE_NOTES
 %dir %{_libdir}/mpich
@@ -175,9 +149,11 @@ make check V=1
 %{_sysconfdir}/modulefiles/mpi/
 
 %files autoload
+%defattr(-,root,root)
 %{_sysconfdir}/profile.d/mpich-%{_arch}.*
 
 %files devel
+%defattr(-,root,root)
 %{_includedir}/mpich-%{_arch}/
 %{_libdir}/mpich/lib/pkgconfig/
 %{_libdir}/mpich/lib/*.so
@@ -191,6 +167,7 @@ make check V=1
 %{_rpmconfigdir}/macros.d/macros.mpich
 
 %files help
+%defattr(-,root,root)
 %dir %{_datadir}/mpich
 %{_datadir}/mpich/doc/
 %dir %{_mandir}/mpich-%{_arch}
@@ -198,10 +175,14 @@ make check V=1
 %{_mandir}/mpich-%{_arch}/man3/
 
 %files -n python3-mpich
+%defattr(-,root,root)
 %dir %{python3_sitearch}/mpich
 %{python3_sitearch}/mpich.pth
 
 %changelog
+* Thu Mar 17 2022 misaka00251 <misaka00251@misakanet.cn> - 4.0.1-1
+- Upgrade version to 4.0.1
+
 * Fri Mar 11 2022 wangyangdahai <admin@you2.top> - 3.2.1-14
 - fix m64 flags riscv64
 
