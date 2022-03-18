@@ -1,5 +1,5 @@
---- mpich-3.2.1/src/packaging/envmods/mpich.module.in.orig	2017-11-11 03:19:44.000000000 +0100
-+++ mpich-3.2.1/src/packaging/envmods/mpich.module.in	2018-04-04 14:14:16.553160669 +0200
+--- a/src/packaging/envmods/mpich.module.in.orig	2017-11-11 03:19:44.000000000 +0100
++++ b/src/packaging/envmods/mpich.module.in	2018-04-04 14:14:16.553160669 +0200
 @@ -3,12 +3,23 @@
  #  MPICH module for use with 'environment-modules' package:
  # 
