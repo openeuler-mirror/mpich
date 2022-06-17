@@ -1,0 +1,25 @@
+From 8b755526b701806eeb688e1fd139e638602c67b6 Mon Sep 17 00:00:00 2001
+From: baizg1107 <preloyalwhite@163.com>
+Date: Fri, 17 Jun 2022 17:36:23 +0800
+Subject: [PATCH] fix hwloc undeclared
+
+---
+ src/pm/hydra/tools/topo/hwloc/topo_hwloc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/pm/hydra/tools/topo/hwloc/topo_hwloc.c b/src/pm/hydra/tools/topo/hwloc/topo_hwloc.c
+index 8fff355..d33d15f 100644
+--- a/src/pm/hydra/tools/topo/hwloc/topo_hwloc.c
++++ b/src/pm/hydra/tools/topo/hwloc/topo_hwloc.c
+@@ -428,7 +428,7 @@ HYD_status HYDT_topo_hwloc_init(const char *binding, const char *mapping, const
+         HYDT_topo_hwloc_info.membind = HWLOC_MEMBIND_INTERLEAVE;
+     }
+     else if (!strncmp(membind, "replicate:", strlen("replicate:"))) {
+-        HYDT_topo_hwloc_info.membind = HWLOC_MEMBIND_REPLICATE;
++        HYDT_topo_hwloc_info.membind = HWLOC_MEMBIND_MIGRATE;
+     }
+     else {
+         HYDU_ERR_SETANDJUMP(status, HYD_INTERNAL_ERROR,
+-- 
+2.27.0
+
