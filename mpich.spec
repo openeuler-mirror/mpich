@@ -1,7 +1,7 @@
 Summary:        A high-performance implementation of MPI
 Name:           mpich
 Version:        3.2.1
-Release:        13
+Release:        14
 License:        MIT
 URL:            http://www.mpich.org/
 Source0:        http://www.mpich.org/static/downloads/%{version}/mpich-%{version}.tar.gz
@@ -9,6 +9,7 @@ Source1:        mpich.macros
 Source2:        mpich.pth.py3
 Patch0:         mpich-modules.patch
 Patch3:         0003-soften-version-check.patch
+Patch4:		fix-hwloc-undeclared.patch
 
 BuildRequires:  gcc gcc-c++ gcc-gfortran hwloc-devel >= 1.8 valgrind-devel
 BuildRequires:  python3-devel automake
@@ -202,6 +203,9 @@ make check V=1
 %{python3_sitearch}/mpich.pth
 
 %changelog
+* Fri Jun 17 2022 baizhonggui <baizhonggui@h-partners.com> - 3.2.1-14
+- Fix hwloc undeclared
+
 * Mon Aug 02 2021 linjiaxin5 <linjiaxin5@huawei.com> - 3.2.1-13
 - Fix failure caused by GCC upgrade to 10
 
