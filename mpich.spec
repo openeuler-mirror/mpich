@@ -1,7 +1,7 @@
 Summary:        A high-performance implementation of MPI
 Name:           mpich
 Version:        3.2.1
-Release:        14
+Release:        15
 License:        MIT
 URL:            http://www.mpich.org/
 Source0:        http://www.mpich.org/static/downloads/%{version}/mpich-%{version}.tar.gz
@@ -67,7 +67,7 @@ mpich support for Python 3.
 %{!?opt_fc_fflags: %global opt_fc_fflags %{optflags}}
 %{!?opt_f77_fflags: %global opt_f77_fflags %{optflags}}
 
-%ifarch aarch64
+%ifarch aarch64 riscv64
 %global m_option ""
 %else
 %global m_option -m64
@@ -203,6 +203,9 @@ make check V=1
 %{python3_sitearch}/mpich.pth
 
 %changelog
+* Mon Jan 16 2023 laokz <zhangkai@iscas.ac.cn> - 3.2.1-15
+- Reapply @wangyangdahai "m_option" patch
+
 * Fri Jun 17 2022 baizhonggui <baizhonggui@h-partners.com> - 3.2.1-14
 - Fix hwloc undeclared
 
